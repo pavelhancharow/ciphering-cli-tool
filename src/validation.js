@@ -1,6 +1,7 @@
 const { accessSync, constants } = require('fs');
 const { stderr, exit } = require('process');
-const { warningErr, configErr, duplicationErr, regExpErr, fileErr } = require('./errorsData');
+const { warningErr, regExpErr, fileErr } = require('./errorsData');
+const { isIncluded, isDuplicated } = require('./validations');
 
 function testingFormat(str) {
   const regExp = /^([A-Z\d]{1,2}-)*[A-Z\d]{1,2}$/gm;
@@ -25,15 +26,8 @@ function findingFile(file) {
 }
 
 function validation(args) {
-  if (!args.includes('-c') && !args.includes('--config')) {
-    stderr.write(`${warningErr + configErr}\n`);
-    exit(1);
-  }
-
-  if ([...new Set(args)].length !== args.length) {
-    stderr.write(`${warningErr + duplicationErr}\n`);
-    exit(1);
-  }
+  isIncluded(!args.includes('-c') && !args.includes('--config'));
+  isDuplicated([...new Set(args)].length !== args.length);
 
   const options = {
     cipher: '',
