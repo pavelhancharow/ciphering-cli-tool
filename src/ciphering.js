@@ -1,24 +1,6 @@
-const { stderr, exit } = require('process');
-const { warningErr, commandErr, flagErr, atbashFlagErr } = require('./errorsData');
+const { warningErr, commandErr, atbashFlagErr } = require('./errorsData');
 const { CaesarCipher, ROT8Cipher, AtbashCipher } = require('./ciphers');
-
-function checkingOffset(offset, Cipher) {
-  let result = null;
-
-  switch (offset) {
-    case '1':
-      result = new Cipher(1);
-      break;
-    case '0':
-      result = new Cipher(0);
-      break;
-    default:
-      stderr.write(`${warningErr + flagErr(offset)}\n`);
-      exit(1);
-  }
-
-  return result;
-}
+const { checkingOffset } = require('./validations');
 
 function ciphering(config) {
   const ciphers = [];
@@ -33,15 +15,15 @@ function ciphering(config) {
         break;
       case 'A':
         if (config[i][1]) {
-          stderr.write(`${warningErr + atbashFlagErr(config[i][1])}\n`);
-          exit(1);
+          process.stderr.write(`${warningErr + atbashFlagErr(config[i][1])}\n`);
+          process.exit(1);
         }
 
         ciphers.push(new AtbashCipher());
         break;
       default:
-        stderr.write(`${warningErr + commandErr(config[i][0])}\n`);
-        exit(1);
+        process.stderr.write(`${warningErr + commandErr(config[i][0])}\n`);
+        process.exit(1);
     }
   }
   return ciphers;

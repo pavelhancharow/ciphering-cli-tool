@@ -1,39 +1,8 @@
-const { accessSync, constants } = require('fs');
-const { stderr, exit } = require('process');
-const { warningErr, configErr, duplicationErr, regExpErr, fileErr } = require('./errorsData');
-
-function testingFormat(str) {
-  const regExp = /^([A-Z\d]{1,2}-)*[A-Z\d]{1,2}$/gm;
-
-  if (!str.match(regExp)) {
-    stderr.write(`${warningErr + regExpErr}\n`);
-    exit(1);
-  }
-
-  return str;
-}
-
-function findingFile(file) {
-  try {
-    accessSync(file, constants.F_OK);
-  } catch (e) {
-    stderr.write(`${warningErr + fileErr(file)}\n`);
-    exit(1);
-  }
-
-  return file;
-}
+const { isIncluded, isDuplicated, testingFormat, findingFile } = require('./validations');
 
 function validation(args) {
-  if (!args.includes('-c') && !args.includes('--config')) {
-    stderr.write(`${warningErr + configErr}\n`);
-    exit(1);
-  }
-
-  if ([...new Set(args)].length !== args.length) {
-    stderr.write(`${warningErr + duplicationErr}\n`);
-    exit(1);
-  }
+  isIncluded(!args.includes('-c') && !args.includes('--config'));
+  isDuplicated([...new Set(args)].length !== args.length);
 
   const options = {
     cipher: '',
@@ -43,7 +12,7 @@ function validation(args) {
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '-c' || args[i] === '--config') {
-      options.cipher = testingFormat(args[i + 1], warningErr);
+      options.cipher = testingFormat(args[i + 1]);
     } else if (args[i] === '-i' || args[i] === '--input') {
       options.input = findingFile(args[i + 1]);
     } else if (args[i] === '-o' || args[i] === '--output') {

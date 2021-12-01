@@ -10,6 +10,14 @@ Use the node package manager to install Ciphering CLI Tool.
 npm install
 ```
 
+## Testing
+
+Use the node package manager to test Ciphering CLI Tool.
+
+```bash
+npm run test
+```
+
 ## Usage
 
 CLI tool should accept 3 options (short alias and full name):
